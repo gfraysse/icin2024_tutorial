@@ -1,0 +1,71 @@
+SEED: 42
+
+ENV_INFO:
+  magma_mme_service: 0
+  mem: 0
+  mem_free: 0
+  ue_connected: 0            
+  num_calls_dropped: 0
+  sum_num_calls_dropped: 0
+  crash: False
+  nb_crash: 0
+  ue_attach_rate: 0
+  active_vm: 0
+  vm_count: 0
+  num_vm_sum: 0
+  load: 0
+  total_capacity: 0
+  cost: 0
+  ue_attach_rate_5m: 0
+  cpu_percentage: 0
+
+MAX_ENV_INFO:
+  magma_mme_service: 512
+  mem: 8589934592 # 8*(1024**3)
+  mem_free: 4096
+  ue_connected: 800            
+  num_calls_dropped: 600
+  sum_num_calls_dropped: 800
+  crash: 1
+  nb_crash: 1
+  ue_attach_rate: 3.03
+  active_vm: 100
+  vm_count: 5
+  num_vm_sum: 100
+  load: 6000
+  total_capacity: 25000
+  cost: 1
+  ue_attach_rate_5m: 3
+  cpu_percentage: 100
+
+ENV_DEFAULT_OPTIONS:
+  max_instances: 5.0
+  min_instances: 1.0
+  capacity_per_instance: 500
+  cost_per_instance_per_hour: 0.192
+  step_size_in_seconds: 300
+  observation_size: 5
+  discrete_actions: [-1, 0, 1]
+  metric: SINE_CURVE
+  attach_metric: SINE_ATTACH_RATE
+  offset: 500
+  size: [300, 250]
+  change_rate: 10000
+  safe_env: False
+  render_mode : human
+
+EVALUATION_METRICS:
+  - ue_connected 
+  - ue_attach_rate 
+  - cpu_percentage 
+  - mem_free 
+  - magma_mme_service 
+  - num_calls_dropped
+
+OBSERVATION_METRICS:
+  - ue_connected 
+  - ue_attach_rate 
+  - cpu_percentage 
+  - mem_free 
+  - magma_mme_service 
+  - vm_count
