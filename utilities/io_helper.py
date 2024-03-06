@@ -39,10 +39,10 @@ class IOHelper:
         self.writer.add_scalar(f'RL_parameters/targetNetwork_update_{target_update_steps}', targetNetwork_update, global_step)
     
     def __update_env_tbd(self, env_instance, info, max_limits, total_time_steps):
-        vm_count = env_instance.get_wrapper_attr('num_instances')
+        vm_count = env_instance.unwrapped.num_instances
         self.writer.add_scalar("env_info/vm_count",vm_count , total_time_steps)
 
-        next_state = env_instance.get_wrapper_attr('next_state') 
+        next_state = env_instance.unwrapped.next_state
         
         for k,v in next_state.items():
             if k == 'vm_count':
@@ -66,7 +66,7 @@ class IOHelper:
 
     def __update_state_info_tbd(self, env_instance, total_time_steps):
 
-        next_state_dict = env_instance.get_wrapper_attr('next_state')
+        next_state_dict = env_instance.unwrapped.next_state
        
         self.writer.add_scalar(f"next_state/ue_connected", next_state_dict['ue_connected'], total_time_steps)
         self.writer.add_scalar(f"next_state/ue_attach_rate",  next_state_dict['ue_attach_rate'], total_time_steps)
@@ -79,7 +79,7 @@ class IOHelper:
     def __log_tbd_instance_info(self, env_instance, total_time_steps):
         """Method to log metrics of each Instance on Tensorboard"""
 
-        instances = env_instance.get_wrapper_attr('instances')
+        instances = env_instance.unwrapped.instances
 
         for instance in instances:
 

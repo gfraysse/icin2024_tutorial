@@ -1,0 +1,16 @@
+name: icin_2024
+channels:
+  - defaults
+dependencies:
+  - scikit-learn==1.2.2
+  - nomkl
+  - pytorch==2.2.0
+  - conda-forge::gymnasium
+  - pyyaml
+  - wandb
+  - tensorboard
+  - pandas
+  - overrides
+  - opencv
+  - seaborn
+prefix: /home/cloud/anaconda3/envs/icin_2024
