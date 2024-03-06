@@ -1,7 +1,15 @@
+# Duration of the experiment each epoch will run for STEPS steps
+STEPS: 200 
+EPOCHS: 50 
+EXPLORE: 2000 
+MIN_BUFFER_SIZE_FOR_TRAIN: 4000 
+TARGET_UPDATE_STEPS: 1000 
 
+# random seed
+ACTION_SEED: 42
+
+# learning rate
 INITIAL_LR: 1e-5
-STEPS: 200   ## 5 hours 60*5
-EPOCHS: 500
 
 INITIAL_BETA : 0.628       # b (1/N)*(1/P)**b   (0-1) and  
 BETA_INC : 0.001  # bita inc per sampling  beta goes to 1 after 100 samplings
@@ -11,21 +19,18 @@ GAMMA: 0.99
 OPTIM: adam
 RESUME_TRAINING: False
 
-#EPSILON-GREEDY PARAMETERS
+# EPSILON-GREEDY PARAMETERS
 INITIAL_EPSILON: 1
 # INITIAL_EPSILON: 0.01 # Turns of exploration (When we want to resume training)
 FINAL_EPSILON: 0.01
-EXPLORE: 2000
 
-#BUFFER RELATED
-REPLAY_MEMORY: 50000 #1*60*24=1440*7=10080*2=20160  #50000
-MIN_BUFFER_SIZE_FOR_TRAIN: 4000 
-BATCH: 32 # 16
+# BUFFER RELATED
+REPLAY_MEMORY: 50000 
+BATCH: 32 
 BUFFER_NAME: d3qn_gym_test.pickle #For testing
 LOAD_BUFFER : True
-TARGET_UPDATE_STEPS: 1000 #30  # every hours 
 
-ACTION_SEED: 42
+# Only for the telcoCoreScaling env
 MAX_UE_CONNECTED: 250
 
 METRICS_LIST:

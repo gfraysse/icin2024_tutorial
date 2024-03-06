@@ -33,17 +33,27 @@ def main():
 
     logger = IOHelper.get_logger()    
     
-    
-
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # TODO: Instatiate environment
-    env = gym.make(
-        "telco_core_scaling.envs:TelcoCoreScaling-v0"
-    )
 
-    num_metrics = len(METRICS_LIST)
-    num_actions = len(env.get_action_space())
-
+    # TUTORIAL: select the environment you want to use
+    # env = gym.make(
+    #     "telco_core_scaling.envs:TelcoCoreScaling-v0"
+    # )
+    env = gym.make('CartPole-v1', render_mode = 'human')
+    # env = gym.make('Acrobot-v1', render_mode = 'human')
+    # env = gym.make('Pendulum-v1', render_mode = 'human')
+    # env = gym.make('MountainCar-v0', render_mode = 'human')
+    # env = gym.make("LunarLander-v2", continuous=False, gravity=-10.0,
+    #                enable_wind=False, wind_power=15.0, turbulence_power=1.5, render_mode = 'human')
+        
+    try:
+        num_metrics = len(METRICS_LIST)
+        num_actions = len(env.get_action_space())
+    except Exception as e:
+        num_actions = env.action_space.n 
+        num_metrics = env.observation_space.shape[0]
+        env.reset()
+        
     logging.info(f"shape of input state : ( {num_metrics}, 1)")
 
     d3qn_agent = D3QNAgent(num_metrics=num_metrics, 
@@ -73,6 +83,7 @@ def main():
     targetNetwork_update = 1
     writer_helper.write_target_network_update(TARGET_UPDATE_STEPS, targetNetwork_update, global_step=total_time_steps)
 
+    is_done = False
     try:
         for epoch in range(EPOCHS):
             logger.info("\n\n" + "=" * 40 + "Epoch ->" + str(epoch) + "=" * 40)
@@ -83,14 +94,16 @@ def main():
                 logger.info("\n\n" + "-" * 40 + str(time_steps) + "-" * 40)
                 action = d3qn_agent.get_action(state=state, epsilon=epsilon, seed=ACTION_SEED)
                 
-                next_state, reward, _, done, info = env.step(action)
-                max_limits = env.get_limits()
+                next_state, reward, truncated, done, info = env.step(action)
                 total_time_steps += 1
                 episode_reward += reward
-                
-                ## env info
-                writer_helper.update_board(env, info, max_limits, total_time_steps)
-        
+                if "TelcoCoreScaling" in str(env):
+                    max_limits = env.get_limits()
+                    
+                    ## env info
+                    writer_helper.update_board(env, info, max_limits, total_time_steps)
+                else:                    
+                    env.render()
                 d3qn_agent.memory_replay.populate((state, next_state, action, reward, done))
 
                 buffer_size = d3qn_agent.get_current_buffer_size()
@@ -130,7 +143,10 @@ def main():
                 writer_helper.write_buffer_size(buffer_size=buffer_size, total_time_steps=total_time_steps)
 
                 logger.info('====Ep {}\tMoving average score: {:.2f}\tSteps: {}===='.format(epoch, episode_reward, time_steps))
+                if "TelcoCoreScaling" not in str(env) and truncated:
+                    break
                 if done:
+                    is_done = True
                     break
                 state = next_state
 
@@ -140,10 +156,15 @@ def main():
                     d3qn_agent.save_model(epoch, SAVED_MODELS_PATH)
                     
             writer_helper.write_summary(d3qn_agent, time_steps, epoch, episode_reward, total_time_steps)
+            if "TelcoCoreScaling" not in str(env) and is_done:
+                break
         
     except KeyboardInterrupt:
         writer_helper.flush_writers()
-        env.shutdown()
+        try:
+            env.shutdown()
+        except:
+            pass
 
     finally:
         pass
