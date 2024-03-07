@@ -1,4 +1,4 @@
-absl-py==2.1.0
+GGsl-py==2.1.0
 appdirs==1.4.4
 certifi==2024.2.2
 charset-normalizer==3.3.2
@@ -68,3 +68,4 @@ tzdata==2024.1
 urllib3==2.2.1
 wandb==0.16.3
 Werkzeug==3.0.1
+pygame
