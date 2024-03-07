@@ -348,9 +348,11 @@ class TelcoCoreScalingEnv(gym.Env):
 
     def __normalize_metric(self, val, metric):
         max_val = self.env_info.max_values[metric]
-        normalized_val = val / max_val
-        
-        if metric not in ['ue_attach_rate', 'num_calls_dropped']:
-                return normalized_val / len(self.instances)
+        normalized_val = val / (max_val * len(self.instances))
+        # normalized_val = val / max_val
+        if metric in ['num_calls_dropped']:
+            return val / max_val
+        # if metric not in ['ue_attach_rate', 'num_calls_dropped']:
+        #         return normalized_val / len(self.instances)
         
         return normalized_val

@@ -23,7 +23,8 @@ MAX_ENV_INFO:
   magma_mme_service: 512
   mem: 8589934592 # 8*(1024**3)
   mem_free: 4096
-  ue_connected: 800            
+  # ue_connected: 800            
+  ue_connected: 250
   num_calls_dropped: 600
   sum_num_calls_dropped: 800
   crash: 1
