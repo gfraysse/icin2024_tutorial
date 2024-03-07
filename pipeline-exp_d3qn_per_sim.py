@@ -4,6 +4,7 @@ import os.path
 import numpy as np
 import torch
 import gymnasium as gym
+import argparse
 
 from network_architecture.D3QNAgent import D3QNAgent
 
@@ -23,6 +24,20 @@ def resume_training(d3qn_agent, model):
     d3qn_agent.resume_training(model_info_dict)
 
 def main():
+    global TARGET_UPDATE_STEPS, EPOCHS, MIN_BUFFER_SIZE_FOR_TRAIN, STEPS, EXPLORE
+    parser = argparse.ArgumentParser(
+        prog='ICIN tutorial',
+        description='ICIN tutorial',
+        epilog=''
+    )
+    parser.add_argument('-E', '--env', action = 'store', type = str, required = False)
+    parser.add_argument('-s', '--nb_steps', action = 'store', type = int, required = False)
+    parser.add_argument('-e', '--nb_episodes', action = 'store', type = int, required = False)
+    parser.add_argument('-b', '--buffer_size', action = 'store', type = int, required = False)
+    parser.add_argument('-x', '--exploration_duration', action = 'store', type = int, required = False)
+    parser.add_argument('-t', '--target_update_steps', action = 'store', type = int, required = False)
+    args = parser.parse_args(sys.argv[1:])
+    
     #Check for directories to store metadata
     IOHelper.check_dirs(BACKUPS_PATH, 
                         SAVED_MODELS_PATH, 
@@ -35,17 +50,52 @@ def main():
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # TUTORIAL: select the environment you want to use
-    # env = gym.make(
-    #     "telco_core_scaling.envs:TelcoCoreScaling-v0"
-    # )
-    env = gym.make('CartPole-v1', render_mode = 'human')
-    # env = gym.make('Acrobot-v1', render_mode = 'human')
-    # env = gym.make('Pendulum-v1', render_mode = 'human')
-    # env = gym.make('MountainCar-v0', render_mode = 'human')
-    # env = gym.make("LunarLander-v2", continuous=False, gravity=-10.0,
-    #                enable_wind=False, wind_power=15.0, turbulence_power=1.5, render_mode = 'human')
-        
+    if args.env:
+        print("env", args.env)
+        if args.env == "TelcoCoreScaling":
+            env = gym.make("telco_core_scaling.envs:TelcoCoreScaling-v0")
+        elif args.env == "CartPole":
+            env = gym.make('CartPole-v1', render_mode = 'human')
+        elif args.env == "Acrobot":
+            env = gym.make('Acrobot-v1', render_mode = 'human')
+        elif args.env == "Pendulum":
+            env = gym.make('Pendulum-v1', render_mode = 'human')
+        elif args.env == "MountainCar":
+            env = gym.make('MountainCar-v0', render_mode = 'human')
+        elif args.env == "LunarLander":
+            env = gym.make("LunarLander-v2", continuous=False, gravity=-10.0,
+                           enable_wind=False, wind_power=15.0, turbulence_power=1.5, render_mode = 'human')
+        else:
+            print("Unknown env: ", args.env)
+            sys.exit(1)
+    else:
+        # TUTORIAL: select the environment you want to use
+        # env = gym.make(
+        #     "telco_core_scaling.envs:TelcoCoreScaling-v0"
+        # )
+        env = gym.make('CartPole-v1', render_mode = 'human')
+        # env = gym.make('Acrobot-v1', render_mode = 'human')
+        # env = gym.make('Pendulum-v1', render_mode = 'human')
+        # env = gym.make('MountainCar-v0', render_mode = 'human')
+        # env = gym.make("LunarLander-v2", continuous=False, gravity=-10.0,
+        #                enable_wind=False, wind_power=15.0, turbulence_power=1.5, render_mode = 'human')
+
+    if args.nb_episodes:
+        print("nb_episodes", args.nb_episodes)
+        EPOCHS = args.nb_episodes
+    if args.nb_steps:
+        print("nb_steps", args.nb_steps)
+        STEPS = args.nb_steps
+    if args.buffer_size:
+        print("buffer_size", args.buffer_size)
+        MIN_BUFFER_SIZE_FOR_TRAIN = args.buffer_size
+    if args.exploration_duration:
+        print("exploration_duration", args.exploration_duration)
+        EXPLORE = args.exploration_duration
+    if args.target_update_steps:
+        print("target_update_steps", args.target_update_steps)
+        TARGET_UPDATE_STEPS = args.target_update_steps
+
     try:
         num_metrics = len(METRICS_LIST)
         num_actions = len(env.get_action_space())
